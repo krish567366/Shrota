@@ -298,9 +298,10 @@ class AdvancedCheckpointManager:
     def _get_platform_info(self) -> Dict:
         """Get current platform information."""
         
+        import platform
         platform_info = {
             'hostname': os.uname().nodename,
-            'platform': os.uname().system,
+            'platform': platform.system(),
             'python_version': os.sys.version,
             'pytorch_version': torch.__version__,
             'cuda_available': torch.cuda.is_available(),

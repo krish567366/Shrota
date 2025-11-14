@@ -104,10 +104,19 @@ class MultiPlatformTrainingSystem:
         current_time = time.time()
         session_duration = current_time - self.session_start_time
         
-        # Time limits
-        max_time = self.platform_config.max_training_hours * 3600
-        time_remaining = max_time - session_duration
-        time_warning = time_remaining < 1800  # 30 minutes warning
+        # Time limits - handle case where max_training_hours might not be set or is very low
+        max_hours = getattr(self.platform_config, 'max_training_hours', 12)  # Default 12 hours
+        if max_hours <= 0:  # Handle disabled time limits
+            max_time = float('inf')
+            time_remaining = float('inf')
+            time_warning = False
+        else:
+            max_time = max_hours * 3600
+            time_remaining = max_time - session_duration
+            time_warning = time_remaining < 1800  # 30 minutes warning
+            
+            # Debug logging for time limits
+            logger.debug(f"Time limit debug: max_hours={max_hours}, session_duration={session_duration:.1f}s, time_remaining={time_remaining:.1f}s")
         
         # Cost limits
         cost_status = self.cost_tracker.check_limits()
@@ -130,7 +139,7 @@ class MultiPlatformTrainingSystem:
             'memory_warning': memory_warning,
             'gpu_memory_warning': gpu_memory_warning,
             'should_checkpoint': time_warning or cost_status['near_limit'] or memory_warning,
-            'should_stop': time_remaining < 300 or cost_status['over_limit']  # 5 minutes buffer
+            'should_stop': ((time_remaining < 300 and time_remaining != float('inf')) or cost_status['over_limit']) and session_duration > 60  # 5 minutes buffer, but not if time limits disabled, and allow at least 1 minute of training
         }
     
     def handle_interruption(self, checkpoint_manager, model, optimizer, scheduler, dataset_state, metrics, phase):
