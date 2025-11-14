@@ -505,6 +505,19 @@ class CostTracker:
         daily_limit = self.cost_limits.get('daily_limit', 100.0)
         session_limit = self.cost_limits.get('session_limit', 50.0)
         
+        # Handle disabled limits (negative values)
+        limits_disabled = daily_limit < 0 or session_limit < 0
+        
+        if limits_disabled:
+            return {
+                'current_session_cost': self.get_current_cost(),
+                'total_cost': current_total,
+                'daily_limit': daily_limit,
+                'session_limit': session_limit,
+                'near_limit': False,  # Never near limit when disabled
+                'over_limit': False   # Never over limit when disabled
+            }
+        
         return {
             'current_session_cost': self.get_current_cost(),
             'total_cost': current_total,

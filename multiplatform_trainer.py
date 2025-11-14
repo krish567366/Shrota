@@ -302,21 +302,92 @@ class MultiPlatformTrainer:
     
     def _create_model(self, platform_config: Dict):
         """Create model based on platform configuration."""
-        # Placeholder - would create actual model
-        logger.info("🧠 Creating model (placeholder)")
-        return "model_placeholder"
+        logger.info("🧠 Creating model...")
+        
+        try:
+            import torch
+            import torch.nn as nn
+            
+            # Create a simple transformer-based ASR model
+            class SimpleASRModel(nn.Module):
+                def __init__(self, vocab_size=1024, d_model=512, nhead=8, num_layers=6):
+                    super().__init__()
+                    self.d_model = d_model
+                    self.embedding = nn.Linear(80, d_model)  # Mel spectrogram features
+                    self.transformer = nn.TransformerEncoder(
+                        nn.TransformerEncoderLayer(d_model, nhead, batch_first=True),
+                        num_layers
+                    )
+                    self.classifier = nn.Linear(d_model, vocab_size)
+                    
+                def forward(self, x):
+                    x = self.embedding(x)
+                    x = self.transformer(x)
+                    return self.classifier(x)
+            
+            model = SimpleASRModel()
+            logger.info(f"✅ Model created with {sum(p.numel() for p in model.parameters())/1e6:.1f}M parameters")
+            return model
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create model: {e}")
+            # Fallback to simple model
+            import torch.nn as nn
+            model = nn.Linear(80, 1024)  # Simple linear model as fallback
+            logger.info("✅ Created fallback linear model")
+            return model
     
     def _create_optimizer(self, model, platform_config: Dict):
         """Create optimizer based on platform configuration."""
-        # Placeholder - would create actual optimizer
-        logger.info("⚡ Creating optimizer (placeholder)")
-        return "optimizer_placeholder"
+        logger.info("⚡ Creating optimizer...")
+        
+        try:
+            import torch.optim as optim
+            
+            # Use AdamW optimizer with weight decay
+            learning_rate = platform_config.get('learning_rate', 2e-4)
+            weight_decay = platform_config.get('weight_decay', 0.01)
+            
+            optimizer = optim.AdamW(
+                model.parameters(),
+                lr=learning_rate,
+                weight_decay=weight_decay,
+                betas=(0.9, 0.999),
+                eps=1e-8
+            )
+            
+            logger.info(f"✅ AdamW optimizer created (lr={learning_rate}, wd={weight_decay})")
+            return optimizer
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create optimizer: {e}")
+            return None
     
     def _create_scheduler(self, optimizer, platform_config: Dict):
         """Create scheduler based on platform configuration."""
-        # Placeholder - would create actual scheduler
-        logger.info("📈 Creating scheduler (placeholder)")
-        return "scheduler_placeholder"
+        logger.info("📈 Creating scheduler...")
+        
+        try:
+            from torch.optim.lr_scheduler import OneCycleLR
+            
+            # Create OneCycle scheduler for better convergence
+            max_lr = platform_config.get('learning_rate', 2e-4)
+            total_steps = platform_config.get('total_steps', 10000)
+            
+            scheduler = OneCycleLR(
+                optimizer,
+                max_lr=max_lr,
+                total_steps=total_steps,
+                pct_start=0.1,  # 10% warmup
+                anneal_strategy='cos'
+            )
+            
+            logger.info(f"✅ OneCycleLR scheduler created (max_lr={max_lr}, steps={total_steps})")
+            return scheduler
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create scheduler: {e}")
+            return None
     
     def _get_dataset_state(self) -> Dict[str, Any]:
         """Get current dataset training state."""
