@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Add src to path
-sys.path.append(str(Path(__file__).parent.parent))
+sys.path.append(str(Path(__file__).parent / "src"))
 
 from utils.advanced_checkpoint_manager import AdvancedCheckpointManager
 from utils.multiplatform_training_system import MultiPlatformTrainingSystem

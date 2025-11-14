@@ -1,0 +1,25 @@
+# Core ML/DL libraries (minimal set for testing imports)
+torch>=2.1.0
+torchaudio>=2.1.0
+transformers>=4.35.0
+
+# Data handling
+numpy>=1.24.0
+pandas>=2.0.0
+datasets>=2.14.0
+huggingface-hub>=0.16.4
+
+# Audio processing (without librosa which needs numba)
+soundfile>=0.12.0
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Configuration
+pyyaml>=6.0
+
+# Utilities
+tqdm>=4.65.0
+rich>=13.0.0

@@ -1,6 +1,6 @@
-# 🎤 Multi-Lingual Speech Recognition System
+# Shrota - Multi-Platform Indian Multilingual Speech Recognition 🎯
 
-A revolutionary speech recognition system that supports **multi-channel audio** and **100+ languages**, with the ability to **start training on one platform and seamlessly resume on any other**. Built with PyTorch Lightning and optimized for maximum flexibility across cloud platforms.
+**Shrota** (श्रोता - "listener" in Sanskrit) is a production-ready, multi-platform training system for Indian multilingual Automatic Speech Recognition (ASR) models. Train world-class speech recognition models that understand 10+ Indian languages with 8-15x faster training speed.
 
 ## ✨ Revolutionary Features 
 
